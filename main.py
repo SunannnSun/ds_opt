@@ -12,7 +12,11 @@ def read_json(path):
     return data
 
 
-def extract_param(data):
+def write_json(data, path):
+    with open(path, "w") as json_file:
+        json.dump(data, json_file, indent=4)
+
+def read_param(data):
     K = data['K']
     M = data['M']
     Priors = np.array(data['Priors'])
@@ -22,47 +26,45 @@ def extract_param(data):
     return K, M, Priors, Mu, Sigma
 
 
-def write_json(data, path):
-    with open(path, "w") as json_file:
-        json.dump(data, json_file, indent=4)
-
-
 def read_data(data):
     return data["Data"], data["Data_sh"], data["att"], data["x0_all"], data["dt"], data["traj_length"]
 
 
 class ds_opt:
     def __init__(self, data, js_path):
-        self.Data, self.Data_sh, self.att, self.x0_all, self.dt, self.traj_length = read_data(data)
+
+        # data and path
         self.js_path = js_path
+        self.Data, self.Data_sh, self.att, self.x0_all, self.dt, self.traj_length = read_data(data)
         self.original_js = read_json(js_path)
-        self.K, self.M, self.Priors, self.Mu, self.Sigma = extract_param(self.original_js)
-        print('read Mu is: ', self.Mu)
+
+        # gmm parameters
+        self.K, self.M, self.Priors, self.Mu, self.Sigma = read_param(self.original_js)
         self.ds_struct = rearrange_clusters.rearrange_clusters(self.Priors, self.Mu, self.Sigma, self.att)
-        # learned ds parameters
+
+        # ds parameters
         self.A_k = np.zeros((self.K, self.M, self.M))
         self.b_k = np.zeros((self.M, self.K))
         self.P_opt = np.zeros((self.M, self.M))
 
-    def begin(self):
-        P_opt = optimization_tools.optimize_P(self.Data_sh)
-        A_k, b_k = optimization_tools.optimize_lpv_ds_from_data(self.Data, self.att, 2, self.ds_struct, P_opt, 0)
-        
-        # document the learned ds
-        self.A_k = A_k
-        self.b_k = b_k
-        self.P_opt = P_opt
 
+    def begin(self):
+        
+        # run ds-opt
+        self.P_opt = optimization_tools.optimize_P(self.Data_sh)
+        self.A_k, self.b_k = optimization_tools.optimize_lpv_ds_from_data(self.Data, self.att, 2, self.ds_struct, self.P_opt, 0)
+        
+        # process ds parameters for json output
         new_A_k = np.copy(self.A_k)
         new_Sig = np.copy(self.Sigma)
 
-        # convert in-order to the ros data recovery
         for k in range(self.K):
             new_A_k[k] = new_A_k[k].T
             new_Sig[k] = new_Sig[k].T
+            
         Mu_trans = self.ds_struct.Mu.T
-
         new_A_k = new_A_k.reshape(-1).tolist()
+
         self.original_js['Sigma'] = new_Sig.reshape(-1).tolist()
         self.original_js['Mu'] = Mu_trans.reshape(-1).tolist()
         self.original_js['Prior'] = self.ds_struct.Priors.tolist()
@@ -72,9 +74,8 @@ class ds_opt:
         self.original_js["dt"] = self.dt
         self.original_js["gripper_open"] = 0
 
-
-        # (Data, A_k, b_k, traj_length, x0_all, ds_struct)
         write_json(self.original_js, self.js_path)
+
 
     def evaluate(self):
         rmse, e_dot, dwtd = ds_tools.reproduction_metrics(self.Data, self.A_k, self.b_k,
@@ -82,6 +83,7 @@ class ds_opt:
         print("the reproduced RMSE is ", rmse)
         print("the reproduced e_dot is", e_dot)
         print("the reproduced dwtd is ", dwtd)
+
 
     def make_plot(self):
         Data_dim = self.M
