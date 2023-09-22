@@ -51,3 +51,8 @@ ds_opt.make_plot()
 ```
 ![21931692138054_ pic](https://github.com/HuiTakami/ds_opt_ood/assets/97799818/7207f6f9-a93c-494d-84a3-bb691609160e)
 
+
+### Acknowledgements
+
+Code is contributed by Haihui Gao, and is currently maintained by Sunan Sun
+
