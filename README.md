@@ -1,17 +1,17 @@
 # Dynamical System Optimization in Linear Parameter Varying Formulation
 
-This module is an updated rendition of the [previous Python implementation](https://github.com/penn-figueroa-lab/ds-opt-py) of Dynamical System Optimization in Linear Parameter Varying Formulation (LPV-DS). The module has been adapted and integrated as a part of the comprehensive pipeline: Directionality-aware Mixture Model (DAMM) for Dynamical System Learning. Please refer to: https://github.com/SunannnSun/damm_lpvds for complete usage.
+This module is a modified rendition of Haihui Gao's Python implementation of Dynamical System Optimization in Linear Parameter Varying Formulation ([DS-OPT](https://github.com/HuiTakami/ds_opt_ood)). The module has been adapted and integrated as a part of the comprehensive pipeline: Directionality-Aware Mixture Model Parallel Sampling for Efficient Dynamical System Learning. Please refer to [DAMM-LPVDS](https://github.com/SunannnSun/damm_lpvds) for complete usage.
 
 
 ---
 ### Input
-The input of ds_opt consists of data, which should be formulated as a dictionary:
+The input of ds_opt consists of data dictionary of the following form:
 ```
 data_dictionary = {
-    "Data": Data,         # Data point of shape, [dimension, number]
+    "Data": Data,         # Data point of shape, [dimension, number_of_data]
     "Data_sh": Data_sh,   # Shifted attractor to 0 for 'Data' (used in Lyapunov function learning)
     "att": att,           # Attractor of shape, [dimension, 1]
-    "x0_all": x0_all,     # Start points of all demonstrations
+    "x0_all": x0_all,     # Start points for all demonstrations of shape, [dimension, number_of_traj]
     "dt": dt,             # Sample time
 }
 ```
@@ -51,8 +51,4 @@ ds_opt.make_plot()
 ```
 ![21931692138054_ pic](https://github.com/HuiTakami/ds_opt_ood/assets/97799818/7207f6f9-a93c-494d-84a3-bb691609160e)
 
-
-### Acknowledgements
-
-Code is contributed by Haihui Gao, and is currently maintained by Sunan Sun
 
