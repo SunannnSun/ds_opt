@@ -1,30 +1,26 @@
 # Dynamical System Optimization in Linear Parameter Varying Formulation
 
-This module is a updated rendition of the optimization implementation from:
-https://github.com/penn-figueroa-lab/ds-opt-py
-
-The module has been adapted and integrated into a comprehensive real robot pipeline: Directionality-aware Mixture Model (DAMM) for Dynamical System Learning. Please refer to: https://github.com/SunannnSun/damm_lpvds for complete usage.
+This module is an updated rendition of the [previous Python implementation](https://github.com/penn-figueroa-lab/ds-opt-py) of Dynamical System Optimization for Dynamical Systems. The module has been adapted and integrated as a part of the comprehensive pipeline: Directionality-aware Mixture Model (DAMM) for Dynamical System Learning. Please refer to: https://github.com/SunannnSun/damm_lpvds for complete usage.
 
 
 ---
 ### Input
-To utilize it on your algorithm:
+The input of ds_opt consists of data,
 
-The data should be formulated as a dictionary:
+which should be formulated as a dictionary:
 ```
-data = {
-    "Data": Data,         # Dimension x Number of Datapoints
+data_dictionary = {
+    "Data": Data,         # Data point of shape, [dimension, number]
     "Data_sh": Data_sh,   # Shifted attractor to 0 for 'Data' (used in Lyapunov function learning)
-    "att": att,           # Dimension x 1
-    "x0_all": x0_all,     # Dimension x Number of demonstrated trajectory
-                          # This is the start points for all demonstrated trajectories
+    "att": att,           # Attractor of shape, [dimension, 1]
+    "x0_all": x0_all,     # Start points of all demonstrations
     "dt": dt,             # Sample time
 }
 ```
 
-For the clustering result, save this dictionary as a json file:
+and gmm parameters results, which should be saved in `output.json`:
 ```
-json_output = {
+{
     "name": "Clustering Result",
     "K": # Number of clusters,
     "M": # Dimension,
@@ -35,9 +31,9 @@ json_output = {
 ```
 ---
 ### Usage
-import DsOpt class and initialize the object:
+import ds_opt class and initialize the object:
 ```
-ds_opt = DsOpt(#Your data dictionary, #Your json output directory)
+ds_opt = ds_opt(data_dictionary, OUTPUT_JSON_PATH)
 ```
 
 Train:
