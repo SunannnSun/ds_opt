@@ -1,6 +1,6 @@
 # Dynamical System Optimization in Linear Parameter Varying Formulation
 
-This module is an updated rendition of the [previous Python implementation](https://github.com/penn-figueroa-lab/ds-opt-py) of Dynamical System Optimization for Dynamical Systems. The module has been adapted and integrated as a part of the comprehensive pipeline: Directionality-aware Mixture Model (DAMM) for Dynamical System Learning. Please refer to: https://github.com/SunannnSun/damm_lpvds for complete usage.
+This module is an updated rendition of the [previous Python implementation](https://github.com/penn-figueroa-lab/ds-opt-py) of Dynamical System Optimization in Linear Parameter Varying Formulation (LPV-DS). The module has been adapted and integrated as a part of the comprehensive pipeline: Directionality-aware Mixture Model (DAMM) for Dynamical System Learning. Please refer to: https://github.com/SunannnSun/damm_lpvds for complete usage.
 
 
 ---
