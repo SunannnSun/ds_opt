@@ -1,16 +1,10 @@
-# LPV-DS OOD Style for DAMM Pipeline
+# Dynamical System Optimization in Linear Parameter Varying Formulation
 
-This module is an enhanced rendition of the optimization section from:
+This module is a updated rendition of the optimization implementation from:
 https://github.com/penn-figueroa-lab/ds-opt-py
 
-It has been adapted for a comprehensive real robot testing pipeline available at:
-https://github.com/SunannnSun/damm_lpvds
+The module has been adapted and integrated into a comprehensive real robot pipeline: Directionality-aware Mixture Model (DAMM) for Dynamical System Learning. Please refer to: https://github.com/SunannnSun/damm_lpvds for complete usage.
 
-Building upon the output from:
-https://github.com/SunannnSun/damm,
-this module learns a quadratic Lyapunov function. Subsequently, it undertakes regression within the bounds of the Lyapunov function to ensure both precision and stability.
-
-This module will output a .json file that ROS dynamical system executor could execute in Lab.
 
 ---
 ### Input

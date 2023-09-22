@@ -5,7 +5,6 @@ from ds_opt.util.math_tools import ds_tools, optimization_tools
 from ds_opt.util.data_tools import plot_tools, structures, rearrange_clusters
 
 
-
 def read_json(path):
     with open(path, 'r') as f:
         data = json.load(f)
@@ -16,13 +15,14 @@ def write_json(data, path):
     with open(path, "w") as json_file:
         json.dump(data, json_file, indent=4)
 
+
 def read_param(data):
     K = data['K']
     M = data['M']
     Priors = np.array(data['Priors'])
     Mu = np.array(data['Mu']).reshape(K, -1)
     Sigma = np.array(data['Sigma']).reshape(K, M, M)
-    # att = np.array(data['attractor'])
+    
     return K, M, Priors, Mu, Sigma
 
 
@@ -61,7 +61,7 @@ class ds_opt:
         for k in range(self.K):
             new_A_k[k] = new_A_k[k].T
             new_Sig[k] = new_Sig[k].T
-            
+
         Mu_trans = self.ds_struct.Mu.T
         new_A_k = new_A_k.reshape(-1).tolist()
 
