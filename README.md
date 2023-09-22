@@ -5,9 +5,7 @@ This module is an updated rendition of the [previous Python implementation](http
 
 ---
 ### Input
-The input of ds_opt consists of data,
-
-which should be formulated as a dictionary:
+The input of ds_opt consists of data, which should be formulated as a dictionary:
 ```
 data_dictionary = {
     "Data": Data,         # Data point of shape, [dimension, number]
