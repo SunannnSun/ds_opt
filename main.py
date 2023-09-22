@@ -85,7 +85,7 @@ class ds_opt:
         print("the reproduced dwtd is ", dwtd)
 
 
-    def make_plot(self):
+    def plot(self):
         Data_dim = self.M
         ds_handle = lambda x_velo: ds_tools.lpv_ds(x_velo, self.ds_struct, self.A_k, self.b_k)
         ds_opt_plot_option = structures.ds_plot_options()
