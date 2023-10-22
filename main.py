@@ -96,5 +96,5 @@ class ds_opt:
             plot_tools.plot_lyapunov_and_derivatives(self.Data, ds_handle, self.att, self.P_opt)
 
         # Visualized the reproduced trajectories
-        plot_tools.VisualizeEstimatedDS(self.Data[:Data_dim], ds_handle, ds_opt_plot_option)
+        plot_tools.VisualizeEstimatedDS(self.Data[:Data_dim], ds_handle, ds_opt_plot_option, self.att)
 

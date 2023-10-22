@@ -1,3 +1,4 @@
+from ctypes import sizeof
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -136,7 +137,7 @@ def sample_initial_points(x0_all, nb_points, type, plot_volumn):
 
 
 
-def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options):
+def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, att):
     dim = Xi_ref.shape[0]
 
     # Parse Options
@@ -161,7 +162,6 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options):
     if dim == 3:
         num_of_traj = x0_all.shape[1]
         trajs = np.array(x_sim)
-        fig = plt.figure()
         ax1 = plt.axes(projection='3d')
         ax1.scatter(Xi_ref[0], Xi_ref[1], Xi_ref[2], c='r', label='original demonstration', s=5)
         for i in np.arange(num_of_traj):
@@ -184,28 +184,30 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options):
         ax1.set_xlabel(r'$\xi_1(m)$')
         ax1.set_ylabel(r'$\xi_2(m)$')
         ax1.set_zlabel(r'$\xi_3(m)$')
+        ax1.set_title("Experimental Setup", fontsize=24)
         plt.show()
     elif dim == 2:
         num_of_traj = x0_all.shape[1]
         trajs = np.array(x_sim)
-        fig, ax1 = plt.subplots()
-        ax1.scatter(Xi_ref[0], Xi_ref[1], c='r', label='original demonstration', s=3)
+        fig, ax1 = plt.subplots(figsize=(25, 5))
+        line1 = ax1.plot(Xi_ref[0], Xi_ref[1], marker='o', c='r', markersize=3, linestyle='None', label='Demonstration')
+        # line2 = ax1.plot(Xi_ref[0], Xi_ref[1], marker='o', c='r', markersize=3, linestyle='None', label='Old Data')
         for i in np.arange(num_of_traj):
             cur_traj = trajs[:, :, i].T
             if i != num_of_traj - 1:
-                ax1.plot(cur_traj[0], cur_traj[1], 'blue')
+                ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=2)
             else:
-                ax1.plot(cur_traj[0], cur_traj[1], 'blue', label='reproduced trajectories')
+                ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=2, label='Reproduction')
         ax1.set_xlabel(r'$\xi_1$')
         ax1.set_ylabel(r'$\xi_2$')
-        ax1.set_title('LPV-DS')
+        # ax1.set_title('GMM (position+velocity) + LPV-DS', fontsize=24)
 
         axis_limits = ax1.viewLim
         x0 = axis_limits.x0
         y0 = axis_limits.y0
         x1 = axis_limits.x1
         y1 = axis_limits.y1
-        resolution = 60
+        resolution = 15
         x_range = np.arange(x0, x1, (x1 - x0) / resolution)
         y_range = np.arange(y0, y1, (y1 - y0) / resolution)
         xx, yy = np.meshgrid(x_range, y_range)
@@ -213,8 +215,9 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options):
         field_velo = ds_lpv(field_data)
         # field_velo[0] /= np.sqrt(field_velo[0] ** 2 + field_velo[1] ** 2)
         # field_velo[1] /= np.sqrt(field_velo[0] ** 2 + field_velo[1] ** 2)
-        ax1.streamplot(xx, yy, field_velo[0].reshape(xx.shape), field_velo[1].reshape(yy.shape), density=[3.5, 3.5])
-
+        ax1.streamplot(xx, yy, field_velo[0].reshape(xx.shape), field_velo[1].reshape(yy.shape), density=[1.5, 1.5])
+        
+        ax1.scatter(att[0], att[1], marker=(8, 2, 0), s=150, c='k', label='Target')
         # random_initial_points = sample_initial_points(x0_all, nb_pnts, init_type, [])
         # ax1.scatter(random_initial_points[0], random_initial_points[1], random_initial_points[2], c='b', s=5)
         # trajs_rand = np.array(simulation(random_initial_points, ds_lpv, opt_sim))
@@ -224,5 +227,15 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options):
         #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue', label='random trajectories')
         #     else:
         #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
-        ax1.legend(loc="best")
+        
+        from matplotlib.legend_handler import HandlerLine2D
+        ax1.legend(handler_map={line1[0]: HandlerLine2D(numpoints=5)}, bbox_to_anchor=(1, 1.15), ncol=4, fancybox=True, fontsize=24)
+
+        ax1.set_title("Experimental Setup", fontsize=24)
+
+
+
+
+
+        # ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3, fancybox=True, fontsize=24)
         plt.show()
