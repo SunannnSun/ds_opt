@@ -139,12 +139,8 @@ def sample_initial_points(x0_all, nb_points, type, plot_volumn):
 
 
 
-<<<<<<< HEAD
-def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, att):
-=======
 def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
     print(len(args_))
->>>>>>> 21194dad5aef919eeee481bf5a91c6f12acb0a23
     dim = Xi_ref.shape[0]
 
     # Parse Options
@@ -192,25 +188,11 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         num_of_traj = x0_all.shape[1]
         print('Number of trajectory: ', num_of_traj)
         trajs = np.array(x_sim)
-<<<<<<< HEAD
-        ax1 = plt.axes(projection='3d')
-        ax1.scatter(Xi_ref[0], Xi_ref[1], Xi_ref[2], c='r', label='original demonstration', s=5)
-=======
->>>>>>> 21194dad5aef919eeee481bf5a91c6f12acb0a23
         for i in np.arange(num_of_traj):
             cur_traj = trajs[:, :, i].T
             if i != num_of_traj - 1:
                 ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=3.5)
             else:
-<<<<<<< HEAD
-                ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
-        legend = ax1.legend(loc="best")
-        legend.set_draggable(True)
-        ax1.set_xlabel(r'$\xi_1(m)$')
-        ax1.set_ylabel(r'$\xi_2(m)$')
-        ax1.set_zlabel(r'$\xi_3(m)$')
-        ax1.set_title("Experimental Setup", fontsize=24)
-=======
                 ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=3.5, label='Reproduction')
         
         ax.scatter(att[0], att[1], att[2], marker=(8, 2, 0), s=150, c='k', label='Target')
@@ -228,7 +210,6 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
->>>>>>> 21194dad5aef919eeee481bf5a91c6f12acb0a23
         plt.show()
 
         # random_initial_points = sample_initial_points(x0_all, nb_pnts, init_type, [])
@@ -266,13 +247,9 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
                 ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=2, label='Reproduction')
         ax1.set_xlabel(r'$\xi_1$')
         ax1.set_ylabel(r'$\xi_2$')
-<<<<<<< HEAD
-        # ax1.set_title('GMM (position+velocity) + LPV-DS', fontsize=24)
-=======
         ax1.set_title('LPV-DS')
-        ax1.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        ax1.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
->>>>>>> 21194dad5aef919eeee481bf5a91c6f12acb0a23
+        # ax1.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        # ax1.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
 
         axis_limits = ax1.viewLim
         x0 = axis_limits.x0
