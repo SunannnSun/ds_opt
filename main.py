@@ -56,6 +56,7 @@ class ds_opt:
         
         # process ds parameters for json output
         new_A_k = np.copy(self.A_k)
+        new_b_k = np.copy(self.b_k)
         new_Sig = np.copy(self.Sigma)
 
         for k in range(self.K):
@@ -69,6 +70,7 @@ class ds_opt:
         self.original_js['Mu'] = Mu_trans.reshape(-1).tolist()
         self.original_js['Prior'] = self.ds_struct.Priors.tolist()
         self.original_js['A'] = new_A_k
+        self.original_js['b'] = new_b_k.reshape(-1).tolist()
         self.original_js['attractor']= self.att.ravel().tolist()
         self.original_js['att_all']= self.att.ravel().tolist()
         self.original_js["dt"] = self.dt
