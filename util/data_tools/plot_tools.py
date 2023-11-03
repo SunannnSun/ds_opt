@@ -11,7 +11,7 @@ import matplotlib.lines as mlines
 
 
 font = {'family' : 'Times New Roman',
-         'size'   : 14
+         'size'   : 20
         #  'serif':  'cmr10'
          }
 mpl.rc('font', **font)
@@ -105,7 +105,6 @@ def plot_reference_trajectories_DS(Data, att, vel_sample, vel_size):
             W[i] = dir_[2]
         q = ax.quiver(vel_points[0], vel_points[1], vel_points[2], U, V, W, length=0.04, normalize=True,colors='k')
 
-
     plt.show()
 
 
@@ -122,8 +121,7 @@ def sample_initial_points(x0_all, nb_points, type, plot_volumn):
     V, D, init_mu = pca_tools.my_pca(x0_all)
     D[0][0] = 1.5 * D[0][0] # extend the -smallest- dimension
     D[2][2] = 5 * D[2][2] # extend the -smallest- dim # WHAT?
-    # Matlab是第一个最大
-    # 检查一下那哪个才是最大的
+
 
     A_y, y0_all = pca_tools.project_pca(x0_all, init_mu, V, dim)
     Ymin_values = np.min(y0_all, axis=1)
@@ -144,7 +142,7 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
     dim = Xi_ref.shape[0]
 
     # Parse Options
-    plot_repr = ds_plot_options.sim_traj  # 是否画reproduction
+    plot_repr = ds_plot_options.sim_traj  
     x0_all = ds_plot_options.x0_all
     att = ds_plot_options.attractor
 
@@ -167,20 +165,19 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         if len(args_)==1:  
             prev_data = args_[0]
             new_data = Xi_ref
-            fig = plt.figure(figsize=(16, 10))
+            fig = plt.figure(figsize=(10, 8))
             ax = fig.add_subplot(projection='3d')
             ax.plot(prev_data[0], prev_data[1], prev_data[2], 'o', color='r', markersize=1.5,  label='original data')
             # ax.scatter(att[0], att[1], att[2], s=200, c='blue', alpha=0.5)
             ax.plot(new_data[0], new_data[1], new_data[2], 'o', color = 'magenta', markersize=1.5,  label='new data')
         
-
             new_label = mlines.Line2D([], [], color='red',
                                 linewidth=3, label='Old Demo')
             old_label = mlines.Line2D([], [], color='magenta',
                                 linewidth=3, label='New Demo')
             ax.legend(handles=[new_label, old_label])
         else:
-            fig = plt.figure()
+            fig = plt.figure(figsize=(10, 8))
             ax = plt.axes(projection='3d')
             ax.scatter(Xi_ref[0,::4], Xi_ref[1,::4], Xi_ref[2,::4], c='r', label='Demonstration', s=10)
 
@@ -191,16 +188,16 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         for i in np.arange(num_of_traj):
             cur_traj = trajs[:, :, i].T
             if i != num_of_traj - 1:
-                ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=3.5)
+                ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=6)
             else:
-                ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=3.5, label='Reproduction')
+                ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=6, label='Reproduction')
         
         ax.scatter(att[0], att[1], att[2], marker=(8, 2, 0), s=150, c='k', label='Target')
         ax.axis('auto')
         ax.set_title('DAMM LPV-DS', fontsize=24)
-        ax.set_xlabel(r'$\xi_1(m)$', fontsize=26)
-        ax.set_ylabel(r'$\xi_2(m)$', fontsize=26)
-        ax.set_zlabel(r'$\xi_3(m)$', fontsize=26)
+        ax.set_xlabel(r'$\xi_1(m)$')
+        ax.set_ylabel(r'$\xi_2(m)$')
+        ax.set_zlabel(r'$\xi_3(m)$')
         ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
         ax.yaxis.set_major_locator(MaxNLocator(nbins=5))
         ax.zaxis.set_major_locator(MaxNLocator(nbins=5))
@@ -222,34 +219,22 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         #     else:
         #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
 
-        # legend = ax1.legend(loc="best")
-        # legend.set_draggable(True)
-        # ax1.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        # ax1.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        # ax1.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        # ax1.set_xlabel(r'$\xi_1(m)$')
-        # ax1.set_ylabel(r'$\xi_2(m)$')
-        # ax1.set_zlabel(r'$\xi_3(m)$')
-        # plt.show()
+
 
 
     elif dim == 2:
         num_of_traj = x0_all.shape[1]
         trajs = np.array(x_sim)
-        fig, ax1 = plt.subplots(figsize=(25, 5))
+        fig, ax1 = plt.subplots(figsize=(10, 8))
         line1 = ax1.plot(Xi_ref[0], Xi_ref[1], marker='o', c='r', markersize=3, linestyle='None', label='Demonstration')
-        # line2 = ax1.plot(Xi_ref[0], Xi_ref[1], marker='o', c='r', markersize=3, linestyle='None', label='Old Data')
         for i in np.arange(num_of_traj):
             cur_traj = trajs[:, :, i].T
             if i != num_of_traj - 1:
-                ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=2)
+                ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=4)
             else:
-                ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=2, label='Reproduction')
+                ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=4, label='Reproduction')
         ax1.set_xlabel(r'$\xi_1$')
         ax1.set_ylabel(r'$\xi_2$')
-        ax1.set_title('LPV-DS')
-        # ax1.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        # ax1.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
 
         axis_limits = ax1.viewLim
         x0 = axis_limits.x0
@@ -262,11 +247,16 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         xx, yy = np.meshgrid(x_range, y_range)
         field_data = np.vstack((xx.flatten(), yy.flatten()))
         field_velo = ds_lpv(field_data)
+        
+        # Unsure about the normalization
         # field_velo[0] /= np.sqrt(field_velo[0] ** 2 + field_velo[1] ** 2)
         # field_velo[1] /= np.sqrt(field_velo[0] ** 2 + field_velo[1] ** 2)
+
         ax1.streamplot(xx, yy, field_velo[0].reshape(xx.shape), field_velo[1].reshape(yy.shape), density=[1.5, 1.5])
         
         ax1.scatter(att[0], att[1], marker=(8, 2, 0), s=150, c='k', label='Target')
+
+        # 
         # random_initial_points = sample_initial_points(x0_all, nb_pnts, init_type, [])
         # ax1.scatter(random_initial_points[0], random_initial_points[1], random_initial_points[2], c='b', s=5)
         # trajs_rand = np.array(simulation(random_initial_points, ds_lpv, opt_sim))
@@ -278,15 +268,10 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
         
         from matplotlib.legend_handler import HandlerLine2D
-        ax1.legend(handler_map={line1[0]: HandlerLine2D(numpoints=5)}, bbox_to_anchor=(1, 1.15), ncol=4, fancybox=True, fontsize=24)
+        ax1.legend(handler_map={line1[0]: HandlerLine2D(numpoints=5)}, bbox_to_anchor=(1, 1.15), ncol=4, fancybox=True, fontsize=14)
 
-        ax1.set_title("Experimental Setup", fontsize=24)
+        ax1.set_title("DAMM LPV-DS", fontsize=30)
 
-
-
-
-
-        # ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3, fancybox=True, fontsize=24)
         plt.show()
 
 
@@ -340,9 +325,9 @@ def plot_incremental_ds(Xi_ref, ds_lpv, ds_plot_options, prev_data):
     ax.scatter(att[0], att[1], att[2], marker=(8, 2, 0), s=150, c='k', label='Target')
     ax.axis('auto')
     ax.set_title('DAMM LPV-DS', fontsize=24)
-    ax.set_xlabel(r'$\xi_1(m)$', fontsize=26)
-    ax.set_ylabel(r'$\xi_2(m)$', fontsize=26)
-    ax.set_zlabel(r'$\xi_3(m)$', fontsize=26)
+    ax.set_xlabel(r'$\xi_1(m)$')
+    ax.set_ylabel(r'$\xi_2(m)$')
+    ax.set_zlabel(r'$\xi_3(m)$')
     ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
     ax.yaxis.set_major_locator(MaxNLocator(nbins=5))
     ax.zaxis.set_major_locator(MaxNLocator(nbins=5))
