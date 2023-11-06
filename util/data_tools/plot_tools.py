@@ -7,6 +7,7 @@ from ..math_tools import lyapunov_tools, pca_tools
 from ..data_tools import structures, simulation
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import FormatStrFormatter
+from matplotlib.legend_handler import HandlerLine2D
 import matplotlib.lines as mlines
 
 
@@ -137,22 +138,16 @@ def sample_initial_points(x0_all, nb_points, type, plot_volumn):
 
 
 
-def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
-    print(len(args_))
-    dim = Xi_ref.shape[0]
+def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
+
+    num_batch = len(data_list)
+    # dim = data_list[0].shape[1]
 
     # Parse Options
     plot_repr = ds_plot_options.sim_traj  
     x0_all = ds_plot_options.x0_all
     att = ds_plot_options.attractor
-
-    if dim == 3:
-        plot_2D_only = 0
-
-        init_type = ds_plot_options.init_type
-        nb_pnts = ds_plot_options.nb_points
-        plot_volumn = ds_plot_options.plot_vol
-
+    
     if plot_repr:
         opt_sim = structures.Opt_Sim()
         opt_sim.dt = 0.005
@@ -161,68 +156,68 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         opt_sim.plot = 0
         x_sim = simulation.simulation(x0_all, ds_lpv, opt_sim)
 
-    if dim == 3:
-        if len(args_)==1:  
-            prev_data = args_[0]
-            new_data = Xi_ref
-            fig = plt.figure(figsize=(10, 8))
-            ax = fig.add_subplot(projection='3d')
-            ax.plot(prev_data[0], prev_data[1], prev_data[2], 'o', color='r', markersize=1.5,  label='original data')
-            # ax.scatter(att[0], att[1], att[2], s=200, c='blue', alpha=0.5)
-            ax.plot(new_data[0], new_data[1], new_data[2], 'o', color = 'magenta', markersize=1.5,  label='new data')
-        
-            new_label = mlines.Line2D([], [], color='red',
-                                linewidth=3, label='Old Demo')
-            old_label = mlines.Line2D([], [], color='magenta',
-                                linewidth=3, label='New Demo')
-            ax.legend(handles=[new_label, old_label])
+
+
+    color_list = ["r", "magenta", "lime"]
+    legend_dict = {}
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(projection='3d')
+    for k in range(num_batch):
+        data_k = data_list[k]
+        line = ax.plot(data_k[0,::2], data_k[1,::2], data_k[2,::2], 'o', color=color_list[k], markersize=1.5, label="batch "+str(k))
+        legend_dict[line[0]] = HandlerLine2D(numpoints=5)
+
+
+    num_of_traj = x0_all.shape[1]
+    print('Number of trajectory: ', num_of_traj)
+    trajs = np.array(x_sim)
+    for i in np.arange(num_of_traj):
+        cur_traj = trajs[:, :, i].T
+        if i != num_of_traj - 1:
+            ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=2)
         else:
-            fig = plt.figure(figsize=(10, 8))
-            ax = plt.axes(projection='3d')
-            ax.scatter(Xi_ref[0,::4], Xi_ref[1,::4], Xi_ref[2,::4], c='r', label='Demonstration', s=10)
+            ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=2, label='Reproduction')
 
+
+
+    ax.scatter(att[0], att[1], att[2], marker=(8, 2, 0), s=150, c='k', label='Target')
+    ax.legend(handler_map=legend_dict, bbox_to_anchor=(1, 1.15), ncol=5, fancybox=True, fontsize=14)
+
+    ax.axis('auto')
+    ax.set_title('DAMM LPV-DS', fontsize=24)
+    ax.set_xlabel(r'$\xi_1(m)$')
+    ax.set_ylabel(r'$\xi_2(m)$')
+    ax.set_zlabel(r'$\xi_3(m)$')
+    ax.set_yticks((-0.6, -0.3, 0, 0.3, 0.6))
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=5))
+    ax.zaxis.set_major_locator(MaxNLocator(nbins=5))
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    plt.show()
+
+
+
+
+def visualize_DS_2D(Xi_ref, ds_lpv, ds_plot_options):
+
+    plot_repr = ds_plot_options.sim_traj  
+    x0_all = ds_plot_options.x0_all
+    att = ds_plot_options.attractor
     
-        num_of_traj = x0_all.shape[1]
-        print('Number of trajectory: ', num_of_traj)
-        trajs = np.array(x_sim)
-        for i in np.arange(num_of_traj):
-            cur_traj = trajs[:, :, i].T
-            if i != num_of_traj - 1:
-                ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=6)
-            else:
-                ax.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'k', linewidth=6, label='Reproduction')
-        
-        ax.scatter(att[0], att[1], att[2], marker=(8, 2, 0), s=150, c='k', label='Target')
-        ax.axis('auto')
-        ax.set_title('DAMM LPV-DS', fontsize=24)
-        ax.set_xlabel(r'$\xi_1(m)$')
-        ax.set_ylabel(r'$\xi_2(m)$')
-        ax.set_zlabel(r'$\xi_3(m)$')
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
-        ax.yaxis.set_major_locator(MaxNLocator(nbins=5))
-        ax.zaxis.set_major_locator(MaxNLocator(nbins=5))
-        ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        ax.zaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        plt.show()
+    if plot_repr:
+        opt_sim = structures.Opt_Sim()
+        opt_sim.dt = 0.005
+        opt_sim.i_max = 10000
+        opt_sim.tol = 0.001
+        opt_sim.plot = 0
+        x_sim = simulation.simulation(x0_all, ds_lpv, opt_sim)
 
-        # random_initial_points = sample_initial_points(x0_all, nb_pnts, init_type, [])
-        # ax1.scatter(random_initial_points[0], random_initial_points[1], random_initial_points[2], c='b', s=5)
-        # trajs_rand = np.array(simulation.simulation(random_initial_points, ds_lpv, opt_sim))
-        # for i in np.arange(nb_pnts):
-        #     cur_traj = trajs_rand[:, :, i].T
-        #     if i == nb_pnts - 1:
-        #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue', label='random trajectories')
-        #     else:
-        #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
-
-
-
-
-    elif dim == 2:
         num_of_traj = x0_all.shape[1]
         trajs = np.array(x_sim)
         fig, ax1 = plt.subplots(figsize=(10, 8))
@@ -267,7 +262,6 @@ def VisualizeEstimatedDS(Xi_ref, ds_lpv, ds_plot_options, *args_):
         #     else:
         #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
         
-        from matplotlib.legend_handler import HandlerLine2D
         ax1.legend(handler_map={line1[0]: HandlerLine2D(numpoints=5)}, bbox_to_anchor=(1, 1.15), ncol=4, fancybox=True, fontsize=14)
 
         ax1.set_title("DAMM LPV-DS", fontsize=30)
