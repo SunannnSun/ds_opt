@@ -150,7 +150,7 @@ def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
     
     if plot_repr:
         opt_sim = structures.Opt_Sim()
-        opt_sim.dt = 0.005
+        opt_sim.dt = 0.1
         opt_sim.i_max = 10000
         opt_sim.tol = 0.001
         opt_sim.plot = 0

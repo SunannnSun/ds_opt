@@ -1,8 +1,8 @@
 import numpy as np
 import json
 
-from ds_opt.util.math_tools import ds_tools, optimization_tools
-from ds_opt.util.data_tools import plot_tools, structures, rearrange_clusters
+from .util.math_tools import ds_tools, optimization_tools
+from .util.data_tools import plot_tools, structures, rearrange_clusters
 
 
 def read_json(path):
@@ -88,12 +88,13 @@ class ds_opt:
 
 
     def plot(self, *args_):
+        Data = self.Data
         Data_dim = self.M
         ds_handle = lambda x_velo: ds_tools.lpv_ds(x_velo, self.ds_struct, self.A_k, self.b_k)
         ds_opt_plot_option = structures.ds_plot_options()
         ds_opt_plot_option.attractor = self.att
-        ds_opt_plot_option.x0_all = np.hstack(args_[1])
-
+        # ds_opt_plot_option.x0_all = np.hstack(args_[1])
+        ds_opt_plot_option.x0_all = self.x0_all
         # print(self.x0_all.shape)
         # The plotting function for lyapunov only valid for data with 2 dimension
         if Data_dim == 2:
@@ -110,6 +111,6 @@ class ds_opt:
         #     # ds_opt_plot_option.x0_all = np.hstack((self.x0_all, args_[2]))
         #     ds_opt_plot_option.x0_all = np.hstack(args_[1])
 
-        plot_tools.visualize_DS_3D(args_[0], ds_handle, ds_opt_plot_option)
+        plot_tools.visualize_DS_3D([Data], ds_handle, ds_opt_plot_option)
         
             
