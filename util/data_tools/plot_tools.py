@@ -10,15 +10,11 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.legend_handler import HandlerLine2D
 import matplotlib.lines as mlines
 
-
 font = {'family' : 'Times New Roman',
-         'size'   : 20
-        #  'serif':  'cmr10'
+         'size'   : 25
          }
+
 mpl.rc('font', **font)
-mpl.rc('text', usetex = True)
-
-
 
 def plot_lyap_fct(Data, att, lyap_fun, title):
     # resolution
@@ -220,7 +216,7 @@ def visualize_DS_2D(Xi_ref, ds_lpv, ds_plot_options):
 
         num_of_traj = x0_all.shape[1]
         trajs = np.array(x_sim)
-        fig, ax1 = plt.subplots(figsize=(10, 8))
+        fig, ax1 = plt.subplots(figsize=(11, 8))
         line1 = ax1.plot(Xi_ref[0], Xi_ref[1], marker='o', c='r', markersize=3, linestyle='None', label='Demonstration')
         for i in np.arange(num_of_traj):
             cur_traj = trajs[:, :, i].T
@@ -228,14 +224,14 @@ def visualize_DS_2D(Xi_ref, ds_lpv, ds_plot_options):
                 ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=4)
             else:
                 ax1.plot(cur_traj[0], cur_traj[1], 'k', linewidth=4, label='Reproduction')
-        ax1.set_xlabel(r'$\xi_1$')
-        ax1.set_ylabel(r'$\xi_2$')
+        ax1.set_xlabel(r'$\xi_1$', fontsize=30)
+        ax1.set_ylabel(r'$\xi_2$', fontsize=30)
 
         axis_limits = ax1.viewLim
         x0 = axis_limits.x0
+        x1 = axis_limits.x1 +0.5
         y0 = axis_limits.y0
-        x1 = axis_limits.x1
-        y1 = axis_limits.y1
+        y1 = axis_limits.y1 +0.25
         resolution = 15
         x_range = np.arange(x0, x1, (x1 - x0) / resolution)
         y_range = np.arange(y0, y1, (y1 - y0) / resolution)
@@ -243,28 +239,15 @@ def visualize_DS_2D(Xi_ref, ds_lpv, ds_plot_options):
         field_data = np.vstack((xx.flatten(), yy.flatten()))
         field_velo = ds_lpv(field_data)
         
-        # Unsure about the normalization
-        # field_velo[0] /= np.sqrt(field_velo[0] ** 2 + field_velo[1] ** 2)
-        # field_velo[1] /= np.sqrt(field_velo[0] ** 2 + field_velo[1] ** 2)
-
         ax1.streamplot(xx, yy, field_velo[0].reshape(xx.shape), field_velo[1].reshape(yy.shape), density=[1.5, 1.5])
         
-        ax1.scatter(att[0], att[1], marker=(8, 2, 0), s=150, c='k', label='Target')
+        ax1.scatter(att[0], att[1], marker=(8, 2, 0), s=300, c='k', label='Target')
 
-        # 
-        # random_initial_points = sample_initial_points(x0_all, nb_pnts, init_type, [])
-        # ax1.scatter(random_initial_points[0], random_initial_points[1], random_initial_points[2], c='b', s=5)
-        # trajs_rand = np.array(simulation(random_initial_points, ds_lpv, opt_sim))
-        # for i in np.arange(nb_pnts):
-        #     cur_traj = trajs_rand[:, :, i].T
-        #     if i == nb_pnts - 1:
-        #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue', label='random trajectories')
-        #     else:
-        #         ax1.plot3D(cur_traj[0], cur_traj[1], cur_traj[2], 'blue')
         
-        ax1.legend(handler_map={line1[0]: HandlerLine2D(numpoints=5)}, bbox_to_anchor=(1, 1.15), ncol=4, fancybox=True, fontsize=14)
+        # ax1.legend(handler_map={line1[0]: HandlerLine2D(numpoints=5)}, bbox_to_anchor=(1, 1.15), ncol=4, fancybox=True, fontsize=14)
 
-        ax1.set_title("DAMM LPV-DS", fontsize=30)
+        ax1.set_title("PC-GMM LPV-DS", fontsize=40)
+        # ax1.set_title("GMM-PV LPV-DS", fontsize=40)
 
         plt.show()
 

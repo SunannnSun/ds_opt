@@ -97,7 +97,7 @@ class ds_opt:
         # print(self.x0_all.shape)
         # The plotting function for lyapunov only valid for data with 2 dimension
         if Data_dim == 2:
-            plot_tools.plot_lyapunov_and_derivatives(self.Data, ds_handle, self.att, self.P_opt)
+            # plot_tools.plot_lyapunov_and_derivatives(self.Data, ds_handle, self.att, self.P_opt)
             plot_tools.visualize_DS_2D(args_[0], ds_handle, ds_opt_plot_option)
 
 
