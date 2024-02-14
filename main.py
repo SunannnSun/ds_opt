@@ -1,8 +1,8 @@
 import numpy as np
 import json
 
-from ds_opt.util.math_tools import ds_tools, optimization_tools
-from ds_opt.util.data_tools import plot_tools, structures, rearrange_clusters
+from .util.math_tools import ds_tools, optimization_tools
+from .util.data_tools import plot_tools, structures, rearrange_clusters
 
 
 def read_json(path):
@@ -31,52 +31,37 @@ def read_data(data):
 
 
 class ds_opt:
-    def __init__(self, data, js_path):
+    def __init__(self, data, Priors, Mu, Sigma):
 
-        # data and path
-        self.js_path = js_path
+
+        # self.js_path = js_path
         self.Data, self.Data_sh, self.att, self.x0_all, self.dt, self.traj_length = read_data(data)
-        self.original_js = read_json(js_path)
+        # self.original_js = read_json(js_path)
 
-        # gmm parameters
-        self.K, self.M, self.Priors, self.Mu, self.Sigma = read_param(self.original_js)
+
+        # self.K, self.M, self.Priors, self.Mu, self.Sigma = read_param(self.original_js)
+        self.Priors = Priors
+        self.Mu = Mu
+        self.Sigma = Sigma
+
+        self.M = Mu.shape[1]
+
         self.ds_struct = rearrange_clusters.rearrange_clusters(self.Priors, self.Mu, self.Sigma, self.att)
 
-        # ds parameters
-        self.A_k = np.zeros((self.K, self.M, self.M))
-        self.b_k = np.zeros((self.M, self.K))
-        self.P_opt = np.zeros((self.M, self.M))
+
+
+        # self.A_k = np.zeros((self.K, self.M, self.M))
+        # self.b_k = np.zeros((self.M, self.K))
+        # self.P_opt = np.zeros((self.M, self.M))
 
 
     def begin(self):
         
-        # run ds-opt
         self.P_opt = optimization_tools.optimize_P(self.Data_sh)
         self.A_k, self.b_k = optimization_tools.optimize_lpv_ds_from_data(self.Data, self.att, 2, self.ds_struct, self.P_opt, 0)
         
-        # process ds parameters for json output
-        new_A_k = np.copy(self.A_k)
-        new_b_k = np.copy(self.b_k)
-        new_Sig = np.copy(self.Sigma)
 
-        for k in range(self.K):
-            new_A_k[k] = new_A_k[k].T
-            new_Sig[k] = new_Sig[k].T
-
-        Mu_trans = self.ds_struct.Mu.T
-        new_A_k = new_A_k.reshape(-1).tolist()
-
-        self.original_js['Sigma'] = new_Sig.reshape(-1).tolist()
-        self.original_js['Mu'] = Mu_trans.reshape(-1).tolist()
-        self.original_js['Prior'] = self.ds_struct.Priors.tolist()
-        self.original_js['A'] = new_A_k
-        self.original_js['b'] = new_b_k.reshape(-1).tolist()
-        self.original_js['attractor']= self.att.ravel().tolist()
-        self.original_js['att_all']= self.att.ravel().tolist()
-        self.original_js["dt"] = self.dt
-        self.original_js["gripper_open"] = 0
-
-        write_json(self.original_js, self.js_path)
+        return self.A_k, self.b_k
 
 
     def evaluate(self):
@@ -87,18 +72,20 @@ class ds_opt:
         print("the reproduced dwtd is ", dwtd)
 
 
+
+
     def plot(self, *args_):
         Data_dim = self.M
         ds_handle = lambda x_velo: ds_tools.lpv_ds(x_velo, self.ds_struct, self.A_k, self.b_k)
         ds_opt_plot_option = structures.ds_plot_options()
         ds_opt_plot_option.attractor = self.att
-        ds_opt_plot_option.x0_all = np.hstack(args_[1])
+        ds_opt_plot_option.x0_all = self.x0_all
 
         # print(self.x0_all.shape)
         # The plotting function for lyapunov only valid for data with 2 dimension
         if Data_dim == 2:
             # plot_tools.plot_lyapunov_and_derivatives(self.Data, ds_handle, self.att, self.P_opt)
-            plot_tools.visualize_DS_2D(args_[0], ds_handle, ds_opt_plot_option)
+            plot_tools.visualize_DS_2D(self.Data, ds_handle, ds_opt_plot_option)
 
 
         # Visualized the reproduced trajectories
@@ -109,7 +96,50 @@ class ds_opt:
         #     # ds_opt_plot_option.x0_all = self.x0_all
         #     # ds_opt_plot_option.x0_all = np.hstack((self.x0_all, args_[2]))
         #     ds_opt_plot_option.x0_all = np.hstack(args_[1])
-
-        plot_tools.visualize_DS_3D(args_[0], ds_handle, ds_opt_plot_option)
+        else:
+            plot_tools.visualize_DS_3D(self.Data, ds_handle, ds_opt_plot_option)
         
-            
+    
+
+    def step(self, x, dt):
+        ds_handle = lambda x_velo: ds_tools.lpv_ds(x_velo, self.ds_struct, self.A_k, self.b_k)
+        
+        xd = ds_handle(x)
+
+        x_next = x + xd * dt   
+        
+        return x_next
+
+
+
+
+    def logOut(self):
+        """
+        If json file exists, overwrite; if not create a new one
+        """    
+
+
+        # new_A_k = np.copy(self.A_k)
+        # new_b_k = np.copy(self.b_k)
+        # new_Sig = np.copy(self.Sigma)
+
+        # for k in range(self.K):
+        #     new_A_k[k] = new_A_k[k].T
+        #     new_Sig[k] = new_Sig[k].T
+
+        # Mu_trans = self.ds_struct.Mu.T
+        # new_A_k = new_A_k.reshape(-1).tolist()
+
+        # self.original_js['Sigma'] = new_Sig.reshape(-1).tolist()
+        # self.original_js['Mu'] = Mu_trans.reshape(-1).tolist()
+        # self.original_js['Prior'] = self.ds_struct.Priors.tolist()
+        # self.original_js['A'] = new_A_k
+        # self.original_js['b'] = new_b_k.reshape(-1).tolist()
+        # self.original_js['attractor']= self.att.ravel().tolist()
+        # self.original_js['att_all']= self.att.ravel().tolist()
+        # self.original_js["dt"] = self.dt
+        # self.original_js["gripper_open"] = 0
+
+        # write_json(self.original_js, self.js_path)
+
+        pass

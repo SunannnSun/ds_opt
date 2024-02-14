@@ -136,7 +136,8 @@ def sample_initial_points(x0_all, nb_points, type, plot_volumn):
 
 def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
 
-    num_batch = len(data_list)
+    # num_batch = len(data_list)
+    num_batch = 1
     # dim = data_list[0].shape[1]
 
     # Parse Options
@@ -146,8 +147,8 @@ def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
     
     if plot_repr:
         opt_sim = structures.Opt_Sim()
-        opt_sim.dt = 0.005
-        opt_sim.i_max = 10000
+        opt_sim.dt = 0.001
+        opt_sim.i_max = int(10E5)
         opt_sim.tol = 0.001
         opt_sim.plot = 0
         x_sim = simulation.simulation(x0_all, ds_lpv, opt_sim)
@@ -160,7 +161,8 @@ def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(projection='3d')
     for k in range(num_batch):
-        data_k = data_list[k]
+        # data_k = data_list[k]
+        data_k = data_list
         line = ax.plot(data_k[0,::2], data_k[1,::2], data_k[2,::2], 'o', color=color_list[k], markersize=1.5, label="batch "+str(k))
         legend_dict[line[0]] = HandlerLine2D(numpoints=5)
 
