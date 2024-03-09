@@ -1,5 +1,5 @@
 import numpy as np
-import json
+import json, sys, os
 
 from .util.math_tools import ds_tools, optimization_tools
 from .util.data_tools import plot_tools, structures, rearrange_clusters
@@ -44,18 +44,19 @@ class ds_opt:
         self.Mu = Mu
         self.Sigma = Sigma
 
+        self.K = Priors.shape[0]
         self.M = Mu.shape[1]
 
         self.ds_struct = rearrange_clusters.rearrange_clusters(self.Priors, self.Mu, self.Sigma, self.att)
 
 
 
-        # self.A_k = np.zeros((self.K, self.M, self.M))
-        # self.b_k = np.zeros((self.M, self.K))
-        # self.P_opt = np.zeros((self.M, self.M))
-
 
     def begin(self):
+        """
+        A: k x M x M
+        b: M x k
+        """
         
         self.P_opt = optimization_tools.optimize_P(self.Data_sh)
         self.A_k, self.b_k = optimization_tools.optimize_lpv_ds_from_data(self.Data, self.att, 2, self.ds_struct, self.P_opt, 0)
@@ -116,30 +117,38 @@ class ds_opt:
     def logOut(self):
         """
         If json file exists, overwrite; if not create a new one
+
+        A: K,M,M
+        b: M,K
         """    
 
+        js_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'output.json')
+        self.original_js = read_json(js_path)
 
-        # new_A_k = np.copy(self.A_k)
-        # new_b_k = np.copy(self.b_k)
-        # new_Sig = np.copy(self.Sigma)
+        new_A_k = np.copy(self.A_k)
+        new_b_k = np.copy(self.b_k)
+        new_Sig = np.copy(self.Sigma)
 
-        # for k in range(self.K):
-        #     new_A_k[k] = new_A_k[k].T
-        #     new_Sig[k] = new_Sig[k].T
+        a = new_b_k.reshape(-1)
+    
 
-        # Mu_trans = self.ds_struct.Mu.T
-        # new_A_k = new_A_k.reshape(-1).tolist()
+        for k in range(self.K):
+            new_A_k[k, :, :] = new_A_k[k, :, :].T
+            new_Sig[k] = new_Sig[k].T
+
+        Mu_trans = self.ds_struct.Mu.T
+        new_A_k = new_A_k.reshape(-1).tolist()
 
         # self.original_js['Sigma'] = new_Sig.reshape(-1).tolist()
         # self.original_js['Mu'] = Mu_trans.reshape(-1).tolist()
-        # self.original_js['Prior'] = self.ds_struct.Priors.tolist()
-        # self.original_js['A'] = new_A_k
-        # self.original_js['b'] = new_b_k.reshape(-1).tolist()
-        # self.original_js['attractor']= self.att.ravel().tolist()
-        # self.original_js['att_all']= self.att.ravel().tolist()
-        # self.original_js["dt"] = self.dt
-        # self.original_js["gripper_open"] = 0
+        # self.original_js['Priors'] = self.ds_struct.Priors.tolist()
+        self.original_js['A'] = new_A_k
+        self.original_js['b'] = new_b_k.reshape(-1).tolist()
+        self.original_js['attractor']= self.att.ravel().tolist()
+        self.original_js['att_all']= self.att.ravel().tolist()
+        self.original_js["dt"] = self.dt
+        self.original_js["gripper_open"] = 0
 
-        # write_json(self.original_js, self.js_path)
+        write_json(self.original_js, js_path)
 
         pass
