@@ -134,7 +134,7 @@ def sample_initial_points(x0_all, nb_points, type, plot_volumn):
 
 
 
-def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
+def visualize_DS_3D(data_list, ds_lpv, ds_plot_options, plot_demo=False):
 
     # num_batch = len(data_list)
     num_batch = 1
@@ -198,6 +198,14 @@ def visualize_DS_3D(data_list, ds_lpv, ds_plot_options):
     ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     plt.show()
+
+    if plot_demo==True:
+        _plot_train_test_4d_demo_pos(data_list ,trajs)
+
+
+def _plot_train_test_4d_demo_pos(p_train, att, p_test, **argv):
+
+    pass
 
 
 
@@ -337,4 +345,21 @@ def plot_incremental_ds(Xi_ref, ds_lpv, ds_plot_options, prev_data):
     # ax1.set_ylabel(r'$\xi_2(m)$')
     # ax1.set_zlabel(r'$\xi_3(m)$')
     # plt.show()
+
+def plot_p_arr(p_arr):
+
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    ax.figure.set_size_inches(12, 6)
+
+    label_list = ['x', 'y', 'z']
+    N = p_arr.shape[0]
+
+
+    colors = ['red', 'blue', 'lime', 'magenta']
+    for k in range(3):
+        ax.plot(np.arange(N), p_arr[:, k], color=colors[k], label = label_list[k])
+
+
+
 

@@ -114,36 +114,36 @@ class ds_opt:
 
 
 
-    def logOut(self):
+    def logOut(self, js_path=[]):
         """
         If json file exists, overwrite; if not create a new one
 
         A: K,M,M
         b: M,K
         """    
-
-        js_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'output.json')
+        if len(js_path) == 0:
+            js_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'output.json')
         self.original_js = read_json(js_path)
 
-        new_A_k = np.copy(self.A_k)
-        new_b_k = np.copy(self.b_k)
-        new_Sig = np.copy(self.Sigma)
+        # new_A_k = np.copy(self.A_k)
+        # new_b_k = np.copy(self.b_k)
+        # new_Sig = np.copy(self.Sigma)    
 
-        a = new_b_k.reshape(-1)
-    
+        # for k in range(self.K):
+        #     new_A_k[k, :, :] = new_A_k[k, :, :].T
+        #     new_Sig[k] = new_Sig[k].T
 
-        for k in range(self.K):
-            new_A_k[k, :, :] = new_A_k[k, :, :].T
-            new_Sig[k] = new_Sig[k].T
-
-        Mu_trans = self.ds_struct.Mu.T
-        new_A_k = new_A_k.reshape(-1).tolist()
+        # Mu_trans = self.ds_struct.Mu.T
+        # new_A_k = new_A_k.reshape(-1).tolist()
 
         # self.original_js['Sigma'] = new_Sig.reshape(-1).tolist()
         # self.original_js['Mu'] = Mu_trans.reshape(-1).tolist()
         # self.original_js['Priors'] = self.ds_struct.Priors.tolist()
-        self.original_js['A'] = new_A_k
-        self.original_js['b'] = new_b_k.reshape(-1).tolist()
+        # self.original_js['A'] = new_A_k
+        # self.original_js['b'] = new_b_k.reshape(-1).tolist()
+            
+        self.original_js['A'] = self.A_k.ravel().tolist()
+        self.original_js['b'] = self.b_k.ravel().tolist()
         self.original_js['attractor']= self.att.ravel().tolist()
         self.original_js['att_all']= self.att.ravel().tolist()
         self.original_js["dt"] = self.dt
